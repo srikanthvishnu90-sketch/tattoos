@@ -9,12 +9,28 @@ The hero preview card contains two honest modes:
 
 `GET /api/capabilities` tells the client which mode is available. `POST /api/generate` validates a data URL and prompt, builds the provider request, and returns a temporary generated image as a data URL. The current small-payload transport is intentionally an MVP; private direct-to-blob uploads and async jobs are the production path.
 
+## Body-area preset catalog
+
+The hero's compact horizontal preset strip is ordered and mapped as follows:
+
+| Label | Local asset |
+| --- | --- |
+| Forearm | `assets/demo-forearm.png` |
+| Bicep | `assets/demo-bicep.png` |
+| Wrist | `assets/demo-wrist.png` |
+| Shoulder | `assets/demo-shoulder.png` |
+| Back | `assets/demo-back.png` |
+| Calf | `assets/demo-calf.png` |
+| Your own | Opens the existing personal-photo file picker |
+
+The six bundled images are clean-body exploration presets. Selection updates the visible preview, pressed state, body-area label, and locked placement context entirely in browser memory. A bundled preset never populates the personal-upload payload and is never sent to OpenAI, even when live generation is configured. Generate from a bundled preset shows the closest existing prepared tattoo sample and labels it as a bundled demo, never as personalized.
+
 ## End-to-end flow
 
-1. The hero renders immediately with the bundled fine-line rose preview.
+1. The hero renders immediately with the local Forearm clean-body preset selected.
 2. The visitor types a tattoo idea and optionally chooses a style.
-3. Without a photo, Generate selects a clearly labeled prepared sample using prompt keywords and style.
-4. The visitor can choose a local JPEG, PNG, or WebP after accepting the consent statement.
+3. With any bundled body-area preset selected, Generate selects a clearly labeled prepared tattoo sample using prompt keywords and style; no preset image is uploaded.
+4. Choosing Your own opens the existing local JPEG, PNG, or WebP picker. The photo is prepared locally, and explicit consent remains required before any live API request.
 5. Browser code decodes the photo, removes original metadata by redrawing it to a canvas, limits the longest edge to 1,536px, and exports a compressed JPEG.
 6. The browser checks `/api/capabilities`. If live generation is unavailable, it does not upload the photo and explains that the visitor can continue with a sample.
 7. In live mode, `/api/generate` validates content type, payload size, prompt length, and the presence of the server-only API key.

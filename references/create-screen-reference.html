@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Stencil — Create Screen</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600&family=Karla:wght@400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#F7F3EA; --card:#FFFFFF; --black:#141210; --brown:#6B4A32;
+  --tan:#C9A87C; --muted:#7A7166; --line:#E6DECE;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Karla',system-ui,sans-serif;background:#E9E2D3;color:var(--black);
+  min-height:100vh;display:grid;place-items:center;padding:36px 12px;-webkit-font-smoothing:antialiased;
+}
+.frame{width:390px;background:var(--black);border-radius:52px;padding:12px;box-shadow:0 40px 100px -30px rgba(20,18,16,.5)}
+.screen{background:var(--bg);border-radius:42px;overflow:hidden;height:812px;display:flex;flex-direction:column;position:relative}
+.sb{display:flex;justify-content:space-between;align-items:center;padding:14px 26px 6px;font-weight:800;font-size:14px}
+.sb .r{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.05em}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 2px}
+.brand{display:flex;align-items:center;gap:8px}
+.brand-mark{width:26px;height:26px;border-radius:8px;border:2px dashed var(--brown);display:grid;place-items:center;color:var(--brown);font-family:'DM Mono',monospace;font-size:12px}
+.brand-name{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:19px}
+.credits{display:flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:5px 11px;font-weight:800;font-size:13px}
+.coin{width:13px;height:13px;border-radius:50%;border:2px solid var(--tan)}
+
+.content{flex:1;overflow:hidden;padding:4px 16px 12px;display:flex;flex-direction:column}
+.mono{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--brown)}
+.ph{font-family:'DM Mono',monospace;font-size:10px;color:var(--brown);text-align:center;line-height:1.7;letter-spacing:.05em}
+
+.h1{font-weight:800;font-size:22px;letter-spacing:-0.02em;padding:2px 4px 10px}
+.h1 .b{font-family:'Fraunces',serif;font-style:italic;font-weight:600;color:var(--brown)}
+
+/* ---- 01 · body part presets ---- */
+.sec-label{display:flex;justify-content:space-between;align-items:center;padding:0 4px 8px}
+.presets{display:flex;gap:9px;overflow-x:auto;padding:0 4px 4px;scrollbar-width:none;margin-bottom:12px}
+.presets::-webkit-scrollbar{display:none}
+.preset{flex-shrink:0;width:58px;text-align:center}
+.pi{width:58px;height:72px;border-radius:12px;border:1.5px dashed var(--tan);background:var(--card);display:grid;place-items:center;position:relative;overflow:hidden}
+.pi .ph{font-size:8.5px}
+.preset.on .pi{border:2.5px solid var(--black)}
+.preset.on .pi::after{content:'';position:absolute;inset:0;background:radial-gradient(75% 55% at 50% 42%,#E9D3BC 0%,#DDC0A2 60%,#CFAE8C 100%)}
+.preset.on .pi span{position:relative;z-index:2;color:#7A5638}
+.pl{margin-top:5px;font-size:10.5px;font-weight:800;white-space:nowrap}
+.preset.own .pi{border-style:dashed;border-color:var(--line)}
+.preset.own .pi .ph{color:var(--muted);font-size:13px}
+
+/* ---- stage ---- */
+.stagecard{flex:1;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:10px;display:flex;flex-direction:column;min-height:0}
+.stage{flex:1;border-radius:15px;position:relative;overflow:hidden;min-height:0;
+  background:radial-gradient(90% 70% at 45% 35%,#EBD6C0 0%,#DFC3A5 55%,#D0B08D 100%)}
+.stage .armph{position:absolute;inset:0;display:grid;place-items:center}
+.stage .armph .ph{background:rgba(247,243,234,.78);border:1px dashed var(--tan);border-radius:10px;padding:10px 14px}
+.part-tag{position:absolute;top:10px;left:10px;font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.1em;background:rgba(247,243,234,.94);border:1px solid var(--line);border-radius:99px;padding:5px 10px}
+.hint-pill{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:var(--muted);background:rgba(247,243,234,.92);border:1px solid var(--line);border-radius:99px;padding:7px 14px;white-space:nowrap}
+
+/* ---- 02 · the chatbox dock ---- */
+.dock{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 20px 60px -18px rgba(10,15,20,.35);padding:8px 10px}
+.dock-chips{display:flex;align-items:center;gap:4px;overflow:hidden;padding:2px 2px 8px}
+.chip-ico{width:30px;height:30px;flex-shrink:0;border-radius:9px;display:grid;place-items:center;color:var(--muted);font-size:13px}
+.qchip{display:flex;align-items:center;gap:5px;white-space:nowrap;border-radius:9px;padding:6px 10px;font-size:12px;font-weight:700}
+.qchip .g{color:var(--brown);font-size:11px}
+.dock-row{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding-top:8px}
+.lock{font-family:'DM Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:var(--brown);border:1.5px dashed var(--tan);border-radius:99px;padding:6px 9px;white-space:nowrap;flex-shrink:0}
+.dprompt{flex:1;font-size:15px;color:var(--black);min-width:0;overflow:hidden;white-space:nowrap}
+.caret{display:inline-block;width:2px;height:17px;background:var(--brown);vertical-align:-3px;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.go{width:40px;height:40px;flex-shrink:0;border-radius:50%;background:var(--black);color:#fff;font-size:16px;display:grid;place-items:center}
+
+.tabs{display:flex;border-top:1px solid var(--line);background:var(--card);padding:10px 8px 22px}
+.tab{flex:1;text-align:center;font-size:11.5px;font-weight:800;color:var(--muted)}
+.tab .ico{display:block;font-size:19px;margin-bottom:3px}
+.tab.on{color:var(--brown)}
+.home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:130px;height:5px;border-radius:99px;background:var(--black);opacity:.85}
+</style>
+</head>
+<body>
+
+<div class="frame"><div class="screen">
+  <div class="sb"><span>11:32</span><span class="r">▲▲ ⏻ ▮▮▮</span></div>
+  <div class="hd">
+    <div class="brand"><span class="brand-mark">S</span><span class="brand-name">Stencil</span></div>
+    <span class="credits"><span class="coin"></span>5</span>
+  </div>
+
+  <div class="content">
+    <div class="h1"><span class="b">Any tattoo.</span> Anywhere on you.</div>
+
+    <!-- 01 · BODY PART -->
+    <div class="sec-label">
+      <span class="mono">01 · PICK A BODY PART</span>
+      <span class="mono" style="color:var(--muted)">SWIPE →</span>
+    </div>
+    <div class="presets">
+      <div class="preset on">
+        <div class="pi"><span class="ph">FORE<br>ARM</span></div>
+        <div class="pl">Forearm</div>
+      </div>
+      <div class="preset">
+        <div class="pi"><span class="ph">BICEP</span></div>
+        <div class="pl">Bicep</div>
+      </div>
+      <div class="preset">
+        <div class="pi"><span class="ph">WRIST</span></div>
+        <div class="pl">Wrist</div>
+      </div>
+      <div class="preset">
+        <div class="pi"><span class="ph">SHOUL<br>DER</span></div>
+        <div class="pl">Shoulder</div>
+      </div>
+      <div class="preset">
+        <div class="pi"><span class="ph">BACK</span></div>
+        <div class="pl">Back</div>
+      </div>
+      <div class="preset">
+        <div class="pi"><span class="ph">CALF</span></div>
+        <div class="pl">Calf</div>
+      </div>
+      <div class="preset own">
+        <div class="pi"><span class="ph">+</span></div>
+        <div class="pl">Your own</div>
+      </div>
+    </div>
+
+    <!-- STAGE -->
+    <div class="stagecard">
+      <div class="stage">
+        <span class="part-tag">FOREARM · PRESET</span>
+        <!-- IMAGE PLACEHOLDER: selected body-part preset photo -->
+        <div class="armph"><span class="ph">[ IMAGE ]<br>preset forearm<br>clean skin · natural light</span></div>
+        <span class="hint-pill">Describe any tattoo below</span>
+      </div>
+
+      <!-- 02 · THE CHATBOX -->
+      <div class="dock">
+        <div class="dock-chips">
+          <span class="chip-ico">↺</span>
+          <span class="qchip"><span class="g">✎</span>Fine-line</span>
+          <span class="qchip"><span class="g">✦</span>Traditional</span>
+          <span class="qchip"><span class="g">◼</span>Blackwork</span>
+          <span class="qchip"><span class="g">◐</span>Color</span>
+        </div>
+        <div class="dock-row">
+          <span class="lock">ON YOUR FOREARM</span>
+          <span class="dprompt">a koi fish swimming upstream…<span class="caret"></span></span>
+          <span class="go">↑</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on"><span class="ico">◈</span>Create</div>
+    <div class="tab"><span class="ico">▣</span>Gallery</div>
+    <div class="tab"><span class="ico">●</span>Profile</div>
+  </div>
+  <div class="home"></div>
+</div></div>
+
+</body>
+</html>
