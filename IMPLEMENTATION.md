@@ -7,7 +7,7 @@ The hero preview card contains two honest modes:
 - **Sample mode:** maps a visitor's prompt and style choice to one of the bundled Stencil previews. It demonstrates the interaction without claiming the result uses the visitor's body.
 - **Live mode:** when `OPENAI_API_KEY` is configured on Vercel, a visitor can consent, upload a body-area photo, describe a tattoo, and send the compressed image to the server-side image-edit endpoint. Provider credentials never enter browser code.
 
-The current demo also includes an exact local renderer for simple geometric requests. Counts from one through ten, common colors, and diamond, circle, triangle, heart, star, or square shapes are composited onto the selected body preset. These results are labeled local placement mockups; illustrative and free-form tattoos still require live AI generation.
+The final preview never uses a client-side graphic overlay. Live generation first creates the requested tattoo artwork, then uses that artwork as a reference while editing the selected body photo. The render prompt requires healed ink that follows anatomy, pores, creases, perspective, shadows, highlights, and natural occlusion.
 
 `GET /api/capabilities` tells the client which mode is available. `POST /api/generate` validates a data URL and prompt, builds the provider request, and returns a temporary generated image as a data URL. The current small-payload transport is intentionally an MVP; private direct-to-blob uploads and async jobs are the production path.
 
@@ -36,9 +36,24 @@ The six bundled images are clean-body exploration presets. Selection updates the
 5. Browser code decodes the photo, removes original metadata by redrawing it to a canvas, limits the longest edge to 1,536px, and exports a compressed JPEG.
 6. The browser checks `/api/capabilities`. If live generation is unavailable, it does not upload the photo and explains that the visitor can continue with a sample.
 7. In live mode, `/api/generate` validates content type, payload size, prompt length, and the presence of the server-only API key.
-8. The function sends a multipart image-edit request to the configured provider and asks it to preserve the person, anatomy, lighting, background, and body photo while adding only the requested tattoo.
-9. The interface exposes real stepped progress without inventing a percentage.
-10. The result replaces the preview, is labeled personalized, and can be downloaded. The original local photo can be removed at any time.
+8. The function makes a fast, low-quality artwork-generation pass that creates the exact isolated tattoo motif without a body or scene.
+9. The function sends the untouched body photo and generated tattoo artwork together to the image-edit endpoint.
+10. The rendering prompt treats the body photo as immutable except for tattooed skin and requires the ink to inherit anatomy, pores, creases, perspective, lighting, shadows, and occlusion.
+11. The interface exposes real stepped progress without inventing a percentage.
+12. The result replaces the preview, is labeled personalized, and can be downloaded. The original local photo can be removed at any time.
+
+## Exact-on-skin generation pipeline
+
+1. **Capture:** select a bundled body area or upload a consented personal photo.
+2. **Normalize:** redraw the photo in browser canvas to strip EXIF, constrain its longest edge, and compress the request.
+3. **Structure the request:** combine the user's verbatim description with selected placement and style. Counts, colors, named symbols, arrangement, and orientation remain hard constraints.
+4. **Generate tattoo artwork:** ask GPT Image 2 for isolated tattoo artwork only. For an American flag, preserve recognizable stars, stripes, field orientation, and requested style; for a skull, preserve the described angle, expression, accessories, and line weight.
+5. **Render into skin:** send the original body image first and artwork second to the multi-image edit endpoint. The first image remains the base; the second is the motif reference.
+6. **Enforce material realism:** explicitly reject sticker, decal, floating-graphic, and printed-overlay appearance. Require curvature, perspective deformation, pores, crease occlusion, hair occlusion, local highlights, shadows, and healed edges.
+7. **Preserve the person:** change only tattoo-related skin pixels. Lock identity, anatomy, fingers, limbs, skin tone, clothing, jewelry, camera angle, crop, depth of field, and background.
+8. **Review:** show the result with a before/after comparison and let the user retry or refine one constraint at a time.
+9. **Evaluate:** benchmark exact motif fidelity, correct body placement, anatomy preservation, edge integration, latency, and accepted-result cost on consented examples for every supported body area.
+10. **Expire:** keep images in memory for this MVP; production storage must be private, signed, and automatically deleted according to the published retention policy.
 
 ## Environment variables
 
