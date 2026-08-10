@@ -22,6 +22,7 @@ export default async function handler(request, response) {
 
   const prompt = String(request.body?.prompt || "").trim();
   const style = String(request.body?.style || "fine-line").trim().slice(0, 40);
+  const placement = String(request.body?.placement || "visible bare-skin area").trim().slice(0, 80);
   const image = parseImage(request.body?.image);
   if (prompt.length < 3 || prompt.length > MAX_PROMPT_LENGTH) {
     return response.status(400).json({ error: `Describe the tattoo in 3–${MAX_PROMPT_LENGTH} characters.` });
@@ -37,10 +38,12 @@ export default async function handler(request, response) {
   form.append("input_fidelity", "high");
   form.append("quality", "medium");
   form.append("prompt", [
-    "Edit this body-area photo into a realistic tattoo placement preview.",
-    `Add only this tattoo: ${prompt}. Style: ${style}.`,
+    "This is a precise tattoo try-on image edit. Edit the supplied body photo; do not create a different person or a new scene.",
+    `Tattoo request (follow literally): ${prompt}`,
+    `Target body placement: ${placement}. Tattoo style: ${style}.`,
+    "Every requested count, shape, color, arrangement, orientation, and size is a hard constraint. For example, if the request says three red diamonds, render exactly three distinct red diamonds—not two, four, gems, flowers, or unrelated marks.",
     "Preserve the person's identity, anatomy, skin tone, body contours, lighting, clothing, camera angle, and background.",
-    "Place the tattoo naturally on the most prominent visible bare-skin area, following curvature and perspective with healed black ink unless color is requested.",
+    `Place the tattoo only on the visible ${placement.toLowerCase()}, following its curvature, perspective, pores, and lighting. Use healed ink. Preserve explicitly requested colors; otherwise use realistic black ink.`,
     "Do not add text, objects, jewelry, extra tattoos, wounds, redness, or changes outside the tattoo itself."
   ].join(" "));
 

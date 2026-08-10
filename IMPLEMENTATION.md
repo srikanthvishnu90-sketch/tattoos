@@ -7,6 +7,8 @@ The hero preview card contains two honest modes:
 - **Sample mode:** maps a visitor's prompt and style choice to one of the bundled Stencil previews. It demonstrates the interaction without claiming the result uses the visitor's body.
 - **Live mode:** when `OPENAI_API_KEY` is configured on Vercel, a visitor can consent, upload a body-area photo, describe a tattoo, and send the compressed image to the server-side image-edit endpoint. Provider credentials never enter browser code.
 
+The current demo also includes an exact local renderer for simple geometric requests. Counts from one through ten, common colors, and diamond, circle, triangle, heart, star, or square shapes are composited onto the selected body preset. These results are labeled local placement mockups; illustrative and free-form tattoos still require live AI generation.
+
 `GET /api/capabilities` tells the client which mode is available. `POST /api/generate` validates a data URL and prompt, builds the provider request, and returns a temporary generated image as a data URL. The current small-payload transport is intentionally an MVP; private direct-to-blob uploads and async jobs are the production path.
 
 ## Body-area preset catalog
